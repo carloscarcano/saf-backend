@@ -1,19 +1,14 @@
 const express = require("express");
-const bodyParser = require("body-parser");
-
-const rutas = require('./src/routes/routes');
 
 const app = new express();
-const puerto = process.env.PORT || 8085;
+const ruteo = require('./src/routes');
 
-app.use(bodyParser.urlencoded({extended: true}));
-app.use(bodyParser.json());
-
-var router = express.Router();
-
-app.use(rutas);
+// configuración
+app.set('puerto', process.env.PORT || 8085);
+app.use(express.json());
+app.use('/api/v1', ruteo);
 
 // iniciar servidor
-app.listen(puerto, function() {
-    console.log(`> servidor iniciado en el puerto ${puerto}`);
+app.listen(app.get('puerto'), () => {
+    console.log('> servidor iniciado en el puerto:', app.get('puerto'));
 });
