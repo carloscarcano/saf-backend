@@ -3,87 +3,132 @@ const globalService = require('../service/globalService');
 
 var agregarTicket = function(req, res)
 {
-    var result = {};
-    const { nombreUsuario, descripcionFalla, fecha } = req.body;
+    const { idUsuario, descripcionError, fechaError } = req.body;
 
     // validación de datos de entrada
-    if(!nombreUsuario || !descripcionFalla || !fecha)
+    if(!idUsuario || !descripcionError || !fechaError)
     {
-        result = globalService.generarMensajeError('faltan datos para poder completar la acción');
+        res.status(400);
+        res.json({ mensaje: globalService.obtenerMensajeFaltanDatos() });
     } 
     else
     {
         // procesar acción
-        result = ticketService.agregarTicket(req);
+        ticketService.agregarTicket(req, (result) => 
+        {
+            if(result.error)
+            {
+                res.status(500);
+                res.json({ mensaje: result.mensaje });
+            }
+            else
+            {
+                res.status(201);
+                res.json({ idTicket: result.idTicket, datosRecibidos: req.body });
+            }
+        });
     }
-
-    res.json(result);
-}
-
-var eliminarTicket = function(req, res)
-{
-    var result = {};
-    const { id } = req.params;
-
-    // validación de datos de entrada
-    if (isNaN(id))
-    {
-        result = globalService.generarMensajeError('tipo de dato incorrecto');
-    }
-    else
-    {
-        // procesar acción
-        result = ticketService.eliminarTicket(id);
-    }
-    
-    res.json(result);
 }
 
 var obtenerTicket = function(req, res)
 {
-    var result = {};
+    const { idTicket } = req.params;
+
+    // validación de datos de entrada
+    if (isNaN(idTicket))
+    {
+        res.status(400);
+        res.json({ mensaje: globalService.obtenerMensajeFormatoInvalido() });
+    }
+    else
+    {
+        // procesar acción
+        ticketService.obtenerTicket(idTicket, (result) => 
+        {
+            if(result.error)
+            {
+                res.status(500);
+                res.json({ mensaje: result.mensaje });
+            }
+            else
+            {
+                res.json({ 
+                    idTicket: result.idTicket,
+                    idUsuario: result.idUsuario,
+                    descripcionError: result.descripcionError,
+                    fechaError: result.fechaError,
+                    fechaTicket: result.fechaTicket, 
+                    estado: result.estado,
+                    datosRecibidos: req.params 
+                });
+            }
+        });
+    }
+}
+
+var modificarTicket = function(req, res)
+{
+    const { idUsuario, descripcionError, fechaError } = req.body;
+    const { idTicket } = req.params.id;
+
+    // validación de datos de entrada
+    if(!idUsuario || !descripcionError || !fechaError)
+    {
+        res.status(400);
+        res.json({ mensaje: globalService.obtenerMensajeFaltanDatos() });
+    }
+    else if(isNaN(idTicket))
+    {
+        res.status(400);
+        res.json({ mensaje: globalService.obtenerMensajeFormatoInvalido() });
+    } 
+    else
+    {
+        // procesar acción
+        var result = ticketService.modificarTicket(idTicket, req);
+
+        if(result.error)
+        {
+            res.status(500);
+            res.json({ mensaje: result.mensaje });
+        }
+        else
+        {
+            res.json({ idTicket: idTicket, datosRecibidos: req.body });
+        }
+    }
+}
+
+var eliminarTicket = function(req, res)
+{
     const { id } = req.params;
 
     // validación de datos de entrada
     if (isNaN(id))
     {
-        result = globalService.generarMensajeError('tipo de dato incorrecto');
+        res.status(400);
+        res.json({ mensaje: globalService.obtenerMensajeFormatoInvalido() });
     }
     else
     {
         // procesar acción
-        result = ticketService.obtenerTicket(id);
-    }
-    
-    res.json(result);
-}
+        var result = ticketService.eliminarTicket(id);
 
-var modificarTicket = function(req, res)
-{
-    var result = {};
-    const { id, nombreUsuario, descripcionFalla, fecha } = req.body;
-
-    // validación de datos de entrada
-    if(!id || !nombreUsuario || !descripcionFalla || !fecha)
-    {
-        result = globalService.generarMensajeError('faltan datos para poder completar la acción');
-    } 
-    else if(isNaN(id))
-    {
-        result = globalService.generarMensajeError('id con formato inválido');
+        if(result.error)
+        {
+            res.status(500);
+            res.json({ mensaje: result.mensaje });
+        }
+        else
+        {
+            res.json({ datosRecibidos: req.params });
+        }
     }
-    else
-    {
-        // procesar acción
-        result = ticketService.modificarTicket(req);
-    }
-
-    res.json(result);
 }
 
 module.exports = {
     agregarTicket,
-    eliminarTicket,
     obtenerTicket,
-    modificarTicket
+    modificarTicket,
+    eliminarTicket
 }

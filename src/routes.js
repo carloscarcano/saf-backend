@@ -10,8 +10,8 @@ router.get('/status', globalController.checkStatus);
 
 // tickets
 router.post('/ticket', ticketController.agregarTicket);
+router.get('/ticket/:idTicket', ticketController.obtenerTicket);
+router.put('/ticket/:id', ticketController.modificarTicket);
 router.delete('/ticket/:id', ticketController.eliminarTicket);
-router.get('/ticket/:id', ticketController.obtenerTicket);
-router.put('/ticket', ticketController.modificarTicket);
 
 module.exports = router;
