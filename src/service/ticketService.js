@@ -40,25 +40,48 @@ var obtenerTicket = (idTicket, funcionCallBack) => {
         else
         {
             var rowsJSON = JSON.parse(JSON.stringify(rows[0]));
-
             result.error = false;
-            result.idTicket = rowsJSON[0].idTicket;
-            result.idUsuario = rowsJSON[0].idUsuario;
-            result.descripcionError = rowsJSON[0].descripcionError;
-            result.fechaError = rowsJSON[0].fechaError;
-            result.fechaTicket = rowsJSON[0].fechaTicket;
-            result.estado = rowsJSON[0].estado;
+
+            if (rowsJSON.length == 0)
+            {
+                result.idTicket = null;
+            }
+            else
+            {
+                result.idTicket = rowsJSON[0].idTicket;
+                result.idUsuario = rowsJSON[0].idUsuario;
+                result.descripcionError = rowsJSON[0].descripcionError;
+                result.fechaError = rowsJSON[0].fechaError;
+                result.fechaTicket = rowsJSON[0].fechaTicket;
+                result.idEstadoTicket = rowsJSON[0].idEstadoTicket;
+            }
         }
 
         funcionCallBack(result);
     });
 }
 
-var modificarTicket = (idTicket, req) => {
+var modificarTicket = (idTicket, req, funcionCallBack) => {
     var result = {};
-    const { idUsuario, descripcionError, fechaError } = req.body;
+    var { descripcionError, fechaError, idEstadoTicket } = req.body;
 
-    mysqlConnection.query('CALL TicketModificar(?, ?, ?, ?)', [idTicket, idUsuario, descripcionError, fechaError], (err, rows, fields) => {
+    if (fechaError)
+    {
+        var fecha = fechaError.split('/');
+        var fechaErrorYMD = fecha[2] + '/' + fecha[1] + '/' + fecha[0];    
+    }
+    else
+    {
+        var fechaErrorYMD = null;
+    }
+
+    if (!descripcionError)
+        descripcionError = null;
+
+    if (!idEstadoTicket)
+        idEstadoTicket = null;
+
+    mysqlConnection.query('CALL TicketsModificar(?, ?, ?, ?)', [idTicket, descripcionError, fechaErrorYMD, idEstadoTicket], (err, rows, fields) => {
         if(err)
         {
             result.error = true;
@@ -66,17 +89,20 @@ var modificarTicket = (idTicket, req) => {
         }
         else
         {
-            result.error = false;
-        }
-    });
+            var rowsJSON = JSON.parse(JSON.stringify(rows));
 
-    return result;
+            result.error = false;
+            result.columnasModificadas = rowsJSON.affectedRows;
+        }
+
+        funcionCallBack(result);
+    });
 }
 
-var eliminarTicket = (idTicket) => {
+var eliminarTicket = (idTicket, funcionCallBack) => {
     var result = {};
 
-    mysqlConnection.query('CALL TicketEliminar(?)', [idTicket], (err, rows, fields) => {
+    mysqlConnection.query('CALL TicketsEliminar(?)', [idTicket], (err, rows, fields) => {
         if(err)
         {
             result.error = true;
@@ -84,11 +110,15 @@ var eliminarTicket = (idTicket) => {
         }
         else
         {
-            result.error = false;
-        }
-    });
+            var rowsJSON = JSON.parse(JSON.stringify(rows));
+            console.log(rowsJSON);
 
-    return result;
+            result.error = false;
+            result.columnasEliminadas = rowsJSON.affectedRows;
+        }
+
+        funcionCallBack(result);
+    });
 }
 
 module.exports = {

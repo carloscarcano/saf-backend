@@ -15,8 +15,13 @@ var obtenerMensajeFormatoInvalido = () => {
     return 'tipo de dato no válido';
 }
 
+var obtenerMensajeNoExistenDatos = () => {
+    return 'no se encontraron registros';
+}
+
 module.exports = {
     checkStatus,
     obtenerMensajeFaltanDatos,
-    obtenerMensajeFormatoInvalido
+    obtenerMensajeFormatoInvalido,
+    obtenerMensajeNoExistenDatos
 }

@@ -11,7 +11,7 @@ router.get('/status', globalController.checkStatus);
 // tickets
 router.post('/ticket', ticketController.agregarTicket);
 router.get('/ticket/:idTicket', ticketController.obtenerTicket);
-router.put('/ticket/:id', ticketController.modificarTicket);
-router.delete('/ticket/:id', ticketController.eliminarTicket);
+router.patch('/ticket/:idTicket', ticketController.modificarTicket);
+router.delete('/ticket/:idTicket', ticketController.eliminarTicket);
 
 module.exports = router;

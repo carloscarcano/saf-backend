@@ -38,7 +38,7 @@ var obtenerTicket = function(req, res)
     if (isNaN(idTicket))
     {
         res.status(400);
-        res.json({ mensaje: globalService.obtenerMensajeFormatoInvalido() });
+        res.json({ mensaje: globalService.obtenerMensajeFormatoInvalido(), datosRecibidos: { idTicket: idTicket } });
     }
     else
     {
@@ -48,19 +48,27 @@ var obtenerTicket = function(req, res)
             if(result.error)
             {
                 res.status(500);
-                res.json({ mensaje: result.mensaje });
+                res.json({ mensaje: result.mensaje, datosRecibidos: { idTicket: idTicket } });
             }
             else
             {
-                res.json({ 
-                    idTicket: result.idTicket,
-                    idUsuario: result.idUsuario,
-                    descripcionError: result.descripcionError,
-                    fechaError: result.fechaError,
-                    fechaTicket: result.fechaTicket, 
-                    estado: result.estado,
-                    datosRecibidos: req.params 
-                });
+                if(result.idTicket == null)
+                {
+                    res.status(404);
+                    res.json({ datosRecibidos: { idTicket: idTicket } });
+                }
+                else
+                {
+                    res.json({ 
+                        idTicket: result.idTicket,
+                        idUsuario: result.idUsuario,
+                        descripcionError: result.descripcionError,
+                        fechaError: result.fechaError,
+                        fechaTicket: result.fechaTicket, 
+                        estado: result.estado,
+                        datosRecibidos: req.params 
+                    });
+                }
             }
         });
     }
@@ -68,61 +76,63 @@ var obtenerTicket = function(req, res)
 
 var modificarTicket = function(req, res)
 {
-    const { idUsuario, descripcionError, fechaError } = req.body;
-    const { idTicket } = req.params.id;
+    const { idTicket } = req.params;
 
     // validación de datos de entrada
-    if(!idUsuario || !descripcionError || !fechaError)
+    if (isNaN(idTicket))
     {
         res.status(400);
-        res.json({ mensaje: globalService.obtenerMensajeFaltanDatos() });
+        res.json({ mensaje: globalService.obtenerMensajeFormatoInvalido(), datosRecibidos: { idTicket: idTicket, datosBody: req.body } });
     }
-    else if(isNaN(idTicket))
-    {
-        res.status(400);
-        res.json({ mensaje: globalService.obtenerMensajeFormatoInvalido() });
-    } 
     else
     {
         // procesar acción
-        var result = ticketService.modificarTicket(idTicket, req);
+        ticketService.modificarTicket(idTicket, req, (result) => 
+        {
+            if(result.error)
+            {
+                res.status(500);
+                res.json({ mensaje: result.mensaje, datosRecibidos: { idTicket: idTicket, datosBody: req.body } });
+            }
+            else
+            {
+                if(result.columnasModificadas == 0)
+                    res.status(404);
 
-        if(result.error)
-        {
-            res.status(500);
-            res.json({ mensaje: result.mensaje });
-        }
-        else
-        {
-            res.json({ idTicket: idTicket, datosRecibidos: req.body });
-        }
+                res.json({ datosRecibidos: { idTicket: idTicket, datosBody: req.body } });
+            }
+        });
     }
 }
 
 var eliminarTicket = function(req, res)
 {
-    const { id } = req.params;
+    const { idTicket } = req.params;
 
     // validación de datos de entrada
-    if (isNaN(id))
+    if (isNaN(idTicket))
     {
         res.status(400);
-        res.json({ mensaje: globalService.obtenerMensajeFormatoInvalido() });
+        res.json({ mensaje: globalService.obtenerMensajeFormatoInvalido(), datosRecibidos: { idTicket: idTicket } });
     }
     else
     {
         // procesar acción
-        var result = ticketService.eliminarTicket(id);
+        ticketService.eliminarTicket(idTicket, (result) => 
+        {
+            if(result.error)
+            {
+                res.status(500);
+                res.json({ mensaje: result.mensaje, datosRecibidos: { idTicket: idTicket } });
+            }
+            else
+            {
+                if(result.columnasEliminadas == 0)
+                    res.status(404);
 
-        if(result.error)
-        {
-            res.status(500);
-            res.json({ mensaje: result.mensaje });
-        }
-        else
-        {
-            res.json({ datosRecibidos: req.params });
-        }
+                res.json({ datosRecibidos: { idTicket: idTicket } });
+            }
+        });
     }
 }
 
