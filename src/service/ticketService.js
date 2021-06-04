@@ -1,5 +1,4 @@
 const mysqlConnection = require('../dbconnection');
-const globalService = require('./globalService');
 
 var agregarTicket = (req, funcionCallBack) => {
     const { idUsuario, descripcionError, fechaError } = req.body;
