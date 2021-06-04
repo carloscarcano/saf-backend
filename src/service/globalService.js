@@ -7,30 +7,21 @@ var checkStatus = () => {
     return result;
 }
 
-var generarMensajeError = (mensaje) => {
-    var result = {};
-
-    result.error = true;
-    result.mensaje = mensaje;
-
-    return result;
+var obtenerMensajeFaltanDatos = () => {
+    return 'faltan datos para poder completar la acción';
 }
 
-var generarMensajeRespuesta = (error, id, mensaje, datosRecibidos) => {
-    var result = {};
+var obtenerMensajeFormatoInvalido = () => {
+    return 'tipo de dato no válido';
+}
 
-    result.error = error;
-    result.id = id;
-    result.mensaje = mensaje;
-    
-    if (datosRecibidos)
-        result.datosRecibidos = datosRecibidos;
-
-    return result;
+var obtenerMensajeNoExistenDatos = () => {
+    return 'no se encontraron registros';
 }
 
 module.exports = {
     checkStatus,
-    generarMensajeError,
-    generarMensajeRespuesta
+    obtenerMensajeFaltanDatos,
+    obtenerMensajeFormatoInvalido,
+    obtenerMensajeNoExistenDatos
 }
