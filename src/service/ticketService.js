@@ -110,7 +110,6 @@ var eliminarTicket = (idTicket, funcionCallBack) => {
         else
         {
             var rowsJSON = JSON.parse(JSON.stringify(rows));
-            console.log(rowsJSON);
 
             result.error = false;
             result.columnasEliminadas = rowsJSON.affectedRows;
