@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/93897352-2357-4d28-b894-7bf939d94607/resourceGroups/appsvc_linux_centralus_basic/providers/Microsoft.Web/sites/saf-api-rest",
+    "appService.deploySubpath": "."
+}
