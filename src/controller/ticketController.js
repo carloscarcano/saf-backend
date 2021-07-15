@@ -65,7 +65,7 @@ var obtenerTicket = function(req, res)
                         descripcionError: result.descripcionError,
                         fechaError: result.fechaError,
                         fechaTicket: result.fechaTicket, 
-                        estado: result.estado,
+                        idEstadoTicket: result.idEstadoTicket,
                         datosRecibidos: req.params 
                     });
                 }
